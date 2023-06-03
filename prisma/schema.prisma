@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialActions"]
 }
 
 datasource db {
@@ -14,22 +15,18 @@ model Car {
   id     Int    @id @default(autoincrement())
   model  String
   year   Int
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
   password String
+  name     String
+  age      Int?
+  from     String?
+  live     String?
+  tel      String?
   car      Car[]
 }
-
-// model profile{
-//   id Int @id @default(autoincrement())
-//   name String
-//   age Int
-//   from String
-//   live String
-//   tel String
-// }
