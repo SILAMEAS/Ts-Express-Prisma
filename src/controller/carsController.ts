@@ -15,7 +15,7 @@ const getOneCar = async (req: Request, res: Response) => {
     const car = await prisma.car.findFirst({
       // include: { car: true, profile: true },
       where: {
-        id: parseInt(id),
+        id: id,
       },
     });
     res.status(200).json(car);
@@ -54,7 +54,7 @@ const deleteCars = async (req: Request, res: Response) => {
     const { id } = req.params;
     const car = await prisma.car.delete({
       where: {
-        id: parseInt(id),
+        id: id,
       },
     });
     res.status(200).json(car);
@@ -68,7 +68,7 @@ const updateCar = async (req: Request, res: Response) => {
     const { id } = req.params;
     const user = await prisma.car.update({
       where: {
-        id: parseInt(id),
+        id: id,
       },
       data: {
         model: model,

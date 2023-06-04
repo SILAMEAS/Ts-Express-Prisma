@@ -17,7 +17,7 @@ const getUser = async (req: Request, res: Response) => {
     const user = await prisma.user.findFirst({
       include: { car: true, Post: true },
       where: {
-        id: parseInt(id),
+        id: id,
       },
     });
     res.status(200).json(user);
@@ -63,12 +63,12 @@ const deleteUser = async (req: Request, res: Response) => {
 
     const user = await prisma.user.delete({
       where: {
-        id: parseInt(id),
+        id: id,
       },
       select: {
         car: {
           where: {
-            userId: parseInt(id),
+            userId: id,
           },
         },
       },
@@ -85,7 +85,7 @@ const updateUser = async (req: Request, res: Response) => {
     const { id } = req.params;
     const user = await prisma.user.update({
       where: {
-        id: parseInt(id),
+        id: id,
       },
       data: {
         email: email,

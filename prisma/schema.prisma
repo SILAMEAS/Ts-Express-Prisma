@@ -12,26 +12,28 @@ datasource db {
 }
 
 model Car {
-  id     Int    @id @default(autoincrement())
+  id     String @id @unique @default(uuid())
   model  String
   year   Int
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int
+  userId String
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  name      String
-  age       Int?
-  from      String?
-  live      String?
-  tel       String?
-  car       Car[]
-  Post      Post[]
-  createdAt DateTime @default(now())
-  role      Role     @default(USER)
+  id           String         @id @unique @default(uuid())
+  email        String         @unique
+  password     String
+  name         String
+  age          Int?
+  from         String?
+  live         String?
+  tel          String?
+  car          Car[]
+  Post         Post[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  role         Role           @default(USER)
+  RefreshToken RefreshToken[]
 }
 
 // model User {
@@ -50,16 +52,35 @@ model User {
 // }
 
 model Post {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @unique @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   published Boolean  @default(false)
   title     String   @db.VarChar(255)
+  like      Int      @default(0)
+  comments  Int      @default(0)
+  shares    Int      @default(0)
+  type      Type     @default(Image)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
+  userId    String
 }
 
 enum Role {
   USER
   ADMIN
+}
+
+enum Type {
+  Image
+  video
+}
+
+model RefreshToken {
+  id          String   @id @unique @default(uuid())
+  hashedToken String
+  userId      String
+  User        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  revoked     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

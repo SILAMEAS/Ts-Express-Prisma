@@ -15,7 +15,7 @@ const getPost = async (req: Request, res: Response) => {
     const post = await prisma.post.findFirst({
       // include: { car: true, profile: true },
       where: {
-        id: parseInt(id),
+        id: id,
       },
     });
     res.status(200).json(post);
@@ -50,7 +50,7 @@ const deletePost = async (req: Request, res: Response) => {
     const { id } = req.params;
     const post = await prisma.post.delete({
       where: {
-        id: parseInt(id),
+        id: id,
       },
     });
     res.status(200).json(post);
@@ -64,7 +64,7 @@ const updatePost = async (req: Request, res: Response) => {
     const { id } = req.params;
     const post = await prisma.post.update({
       where: {
-        id: parseInt(id),
+        id: id,
       },
       data: {
         title: title,
