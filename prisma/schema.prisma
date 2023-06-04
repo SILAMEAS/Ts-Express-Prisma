@@ -20,13 +20,46 @@ model Car {
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  password String
-  name     String
-  age      Int?
-  from     String?
-  live     String?
-  tel      String?
-  car      Car[]
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  age       Int?
+  from      String?
+  live      String?
+  tel       String?
+  car       Car[]
+  Post      Post[]
+  createdAt DateTime @default(now())
+  role      Role     @default(USER)
+}
+
+// model User {
+//   id        Int      @id @default(autoincrement())
+//   createdAt DateTime @default(now())
+//   email     String   @unique
+//   name      String?
+//   password  String
+//   age       Int?
+//   from      String?
+//   live      String?
+//   tel       String?
+//   role      Role     @default(USER)
+//   posts     Post[]
+//   Car       Car[]
+// }
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  published Boolean  @default(false)
+  title     String   @db.VarChar(255)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+}
+
+enum Role {
+  USER
+  ADMIN
 }

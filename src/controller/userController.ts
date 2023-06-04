@@ -1,28 +1,45 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 const prisma = new PrismaClient();
-const getUser = async (req: Request, res: Response) => {
+const getUsers = async (req: Request, res: Response) => {
   try {
     const users = await prisma.user.findMany({
-      include: { car: true },
+      include: { car: true, Post: true },
     });
     res.status(200).json(users);
   } catch (e) {
-    res.status(401).json(e);
+    res.status(400).json(e);
   }
 };
-const getOneUser = async (req: Request, res: Response) => {
+const getUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const user = await prisma.user.findFirst({
-      include: { car: true },
+      include: { car: true, Post: true },
       where: {
         id: parseInt(id),
       },
     });
     res.status(200).json(user);
   } catch (e) {
-    res.status(401).json(e);
+    res.status(400).json(e);
+  }
+};
+const login = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+    console.log("email", email, "password", password);
+    const user = await prisma.user.findFirst({
+      // include: { car: true, Post: true },
+      where: {
+        email: email,
+        password: password,
+      },
+    });
+    // console.log(user);
+    res.status(200).json(user);
+  } catch (e) {
+    res.status(400).json(e);
   }
 };
 const createUser = async (req: Request, res: Response) => {
@@ -37,7 +54,7 @@ const createUser = async (req: Request, res: Response) => {
     });
     res.status(200).json(user);
   } catch (error) {
-    res.status(401).json(error);
+    res.status(400).json(error);
   }
 };
 const deleteUser = async (req: Request, res: Response) => {
@@ -57,9 +74,9 @@ const deleteUser = async (req: Request, res: Response) => {
       },
     });
 
-    res.status(200).json({ message: "delelte" + id });
+    res.status(200).json({ message: "delelte user id :" + id, result: user });
   } catch (error) {
-    res.status(401).json(error);
+    res.status(400).json(error);
   }
 };
 const updateUser = async (req: Request, res: Response) => {
@@ -77,7 +94,7 @@ const updateUser = async (req: Request, res: Response) => {
     });
     res.status(200).json(user);
   } catch (error) {
-    res.status(401).json(error);
+    res.status(400).json(error);
   }
 };
-export { getUser, createUser, getOneUser, deleteUser, updateUser };
+export { getUsers, createUser, getUser, deleteUser, updateUser, login };
