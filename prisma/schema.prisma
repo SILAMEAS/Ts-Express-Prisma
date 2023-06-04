@@ -20,20 +20,21 @@ model Car {
 }
 
 model User {
-  id           String         @id @unique @default(uuid())
-  email        String         @unique
-  password     String
-  name         String
-  age          Int?
-  from         String?
-  live         String?
-  tel          String?
-  car          Car[]
-  Post         Post[]
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  role         Role           @default(USER)
-  RefreshToken RefreshToken[]
+  id                   String         @id @unique @default(uuid())
+  email                String         @unique
+  password             String
+  name                 String
+  age                  Int?
+  from                 String?
+  live                 String?
+  tel                  String?
+  car                  Car[]
+  Post                 Post[]
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  role                 Role           @default(USER)
+  RefreshToken         RefreshToken[]
+  profile_picture_path String         @default("")
 }
 
 // model User {
