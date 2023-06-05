@@ -1,15 +1,12 @@
 import express, { Request, Router } from "express";
+import { userController } from "../controller/userController";
+import { verifyToken } from "../middleware/authMiddle";
+const path = require("path");
 const multer = require("multer");
-import {
-  createUser,
-  deleteUser,
-  deleteUsers,
-  getUser,
-  getUsers,
-  login,
-  updateUser,
-} from "../controller/userController";
 const router = express.Router();
+// -------------------Upload file to storage----------------------------
+// create path for store profile_picture_path
+router.use(express.static(path.join(__dirname, "../uploads")));
 const storage = multer.diskStorage({
   destination: function (req: any, file: any, cb: any) {
     cb(null, "uploads");
@@ -25,21 +22,21 @@ const storage = multer.diskStorage({
     cb(null, fileName);
   },
 });
-
+//--================================================
 const upload = multer({ storage: storage });
 // get all users
-router.get("/users", getUsers);
+router.get("/all", verifyToken, userController.getUsers);
 // get specific user
-router.get("/user/:id", getUser);
+router.get("/:id", verifyToken, userController.getUser);
 // create user
-router.post("/signup", upload.single("image"), createUser);
+router.post("/signup", upload.single("image"), userController.createUser);
 // delete user
-router.delete("/user/:id", deleteUser);
-
-router.delete("/users", deleteUsers);
+router.delete("/all", verifyToken, userController.deleteUsers);
+router.delete("/:id", verifyToken, userController.deleteUser);
 // update user
-router.put("/user/:id", updateUser);
+router.put("/:id", verifyToken, userController.updateUser);
 // login
-router.post("/login", login);
+router.put("/:id", verifyToken, userController.updateUser);
+router.post("/login", userController.login);
 // export all routers of users
 export default router;

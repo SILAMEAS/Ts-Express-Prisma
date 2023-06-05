@@ -3,20 +3,37 @@ import { PrismaClient } from "@prisma/client";
 import userRoute from "./routes/userRoutes";
 import carsRoute from "./routes/carRoutes";
 import postsRoute from "./routes/postRoutes";
-var cors = require("cors");
-const path = require("path");
+import friendsRoute from "./routes/friendRoutes";
+import { verifyToken } from "./middleware/authMiddle";
 import dotenv from "dotenv";
+const cors = require("cors");
 dotenv.config();
 const app = express();
 const prisma = new PrismaClient();
+// can get data json form fron end
 app.use(express.json());
-
+// allow fron end can access to back end
 app.use(cors());
-app.use(express.static(path.join(__dirname, "../uploads")));
-// all routes
-app.use("/api/v1", userRoute);
-app.use("/api/v1", carsRoute);
-app.use("/api/v1", postsRoute);
-app.listen(process.env.PORT, () => {
-  console.log("Server running on port: " + process.env.PORT);
-});
+// handle connection to database
+async function main() {
+  // all routes that we have
+  app.use("/api/v1/user", userRoute);
+  app.use("/api/v1", verifyToken, carsRoute);
+  app.use("/api/v1", verifyToken, postsRoute);
+  app.use("/api/v1/friend", verifyToken, friendsRoute);
+}
+main()
+  .then(async () => {
+    await prisma.$disconnect();
+    // if database connect success
+    console.log("DB connnected");
+    app.listen(process.env.PORT, () => {
+      // show the port that we running back end
+      console.log("Server running on port: " + process.env.PORT);
+    });
+  })
+  .catch(async (e) => {
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });

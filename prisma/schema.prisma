@@ -35,6 +35,7 @@ model User {
   role                 Role           @default(USER)
   RefreshToken         RefreshToken[]
   profile_picture_path String         @default("")
+  friends              String[]
 }
 
 // model User {
