@@ -20,8 +20,8 @@ model Car {
 }
 
 model User {
-  id                   String         @id @unique @default(uuid())
-  email                String         @unique
+  id                   String   @id @unique @default(uuid())
+  email                String   @unique
   password             String
   name                 String
   age                  Int?
@@ -30,11 +30,11 @@ model User {
   tel                  String?
   car                  Car[]
   Post                 Post[]
-  createdAt            DateTime       @default(now())
-  updatedAt            DateTime       @updatedAt
-  role                 Role           @default(USER)
-  RefreshToken         RefreshToken[]
-  profile_picture_path String         @default("")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  role                 Role     @default(USER)
+  // RefreshToken         RefreshToken[]
+  profile_picture_path String   @default("")
   friends              String[]
 }
 
@@ -59,12 +59,15 @@ model Post {
   updatedAt DateTime @updatedAt
   published Boolean  @default(false)
   title     String   @db.VarChar(255)
-  like      Int      @default(0)
-  comments  Int      @default(0)
-  shares    Int      @default(0)
-  type      Type     @default(Image)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
+  like      String[] @default([])
+
+  shares               String[]   @default([])
+  user                 User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  image_path           String
+  username             String
+  profile_picture_path String     @default("")
+  userId               String
+  comments             comments[]
 }
 
 enum Role {
@@ -72,17 +75,22 @@ enum Role {
   ADMIN
 }
 
-enum Type {
-  Image
-  video
+model comments {
+  id        String   @id @unique() @default(uuid())
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  post      Post?    @relation(fields: [postId], references: [id])
+  postId    String?
+  userId    String
 }
 
-model RefreshToken {
-  id          String   @id @unique @default(uuid())
-  hashedToken String
-  userId      String
-  User        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  revoked     Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
+// model RefreshToken {
+//   id          String   @id @unique @default(uuid())
+//   hashedToken String
+//   userId      String
+//   User        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   revoked     Boolean  @default(false)
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
+// }

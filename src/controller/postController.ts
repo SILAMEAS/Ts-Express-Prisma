@@ -1,10 +1,12 @@
 import { PrismaClient } from "@prisma/client";
-import { Request, Response } from "express";
+import express, { Request, Router, Response } from "express";
+
 const prisma = new PrismaClient();
+//--================================================
 const postController = {
   getPosts: async (req: Request, res: Response) => {
     try {
-      const posts = await prisma.post.findMany();
+      const posts = await prisma.post.findMany({ include: { comments: true } });
       res.status(200).json(posts);
     } catch (e) {
       res.status(400).json(e);
@@ -18,6 +20,7 @@ const postController = {
         where: {
           id: id,
         },
+        include: { comments: true },
       });
       res.status(200).json(post);
     } catch (e) {
@@ -25,12 +28,20 @@ const postController = {
     }
   },
   createPost: async (req: Request, res: Response) => {
-    const { title, userId } = req.body;
+    const { title, userId, profile_picture_path, username, image_path } =
+      req.body;
+    console.log(req.body);
     try {
       const post = await prisma.post.create({
-        data: { title: title, userId: userId },
+        data: {
+          userId: userId,
+          title: title,
+          username: username,
+          image_path: image_path,
+          profile_picture_path: profile_picture_path,
+        },
       });
-      res.status(200).json(post);
+      res.status(201).json(post);
     } catch (error) {
       res.status(400).json(error);
     }

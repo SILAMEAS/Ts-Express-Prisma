@@ -19,7 +19,7 @@ async function main() {
   // all routes that we have
   app.use("/api/v1/user", userRoute);
   app.use("/api/v1", verifyToken, carsRoute);
-  app.use("/api/v1", verifyToken, postsRoute);
+  app.use("/api/v1/post", verifyToken, postsRoute);
   app.use("/api/v1/friend", verifyToken, friendsRoute);
 }
 main()

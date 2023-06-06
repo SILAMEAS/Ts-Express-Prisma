@@ -37,6 +37,132 @@ const friendController = {
       res.status(400).json(e);
     }
   },
+  getFriendOrNotFriend: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const user = await prisma.user.findFirst({ where: { id: id } });
+      const myfriends: {
+        id: string;
+        username: string;
+        profile_picture_path: string;
+      }[] = [];
+      const notMyfriends: {
+        id: string;
+        username: string;
+        profile_picture_path: string;
+      }[] = [];
+
+      user &&
+        (await Promise.all(
+          user!.friends.map(async (item) => {
+            const yourFriend = await prisma.user.findFirst({
+              where: { id: item },
+            });
+            if (yourFriend) {
+              const format: {
+                id: string;
+                username: string;
+                profile_picture_path: string;
+              } = {
+                id: yourFriend!.id,
+                username: yourFriend!.name,
+                profile_picture_path: yourFriend!.profile_picture_path,
+              };
+              myfriends.push(format);
+            }
+          })
+        ));
+      const allUsers = await prisma.user.findMany({});
+      allUsers &&
+        (await Promise.all(
+          allUsers.map(async (item) => {
+            if (!user?.friends.includes(item.id)) {
+              const notFriends = await prisma.user.findFirst({
+                where: { id: item.id },
+              });
+              if (notFriends && notFriends.id !== id) {
+                const format: {
+                  id: string;
+                  username: string;
+                  profile_picture_path: string;
+                } = {
+                  id: notFriends.id,
+                  profile_picture_path: notFriends.profile_picture_path,
+                  username: notFriends.name,
+                };
+                notMyfriends.push(format);
+              }
+            }
+          })
+        ));
+      res.json({ friends: myfriends, "not-friends": notMyfriends });
+    } catch (error) {
+      res.json(error);
+    }
+  },
+  likeUnlike: async (req: Request, res: Response) => {
+    try {
+      const { post_id, user_id } = req.body;
+      const post = await prisma.post.findFirst({ where: { id: post_id } });
+      if (post?.like.includes(user_id)) {
+        post.like = post.like.filter((id) => id !== user_id);
+        await prisma.post.update({
+          where: { id: post_id },
+          data: { like: post.like },
+        });
+      } else {
+        post?.like.push(user_id);
+        await prisma.post.update({
+          where: { id: post_id },
+          data: { like: post!.like },
+        });
+      }
+      res.status(201).json(post);
+    } catch (error) {
+      res.status(400).json(error);
+    }
+  },
+  shareOrUnShare: async (req: Request, res: Response) => {
+    try {
+      const { post_id, user_id } = req.body;
+      const post = await prisma.post.findFirst({ where: { id: post_id } });
+      if (post?.shares.includes(user_id)) {
+        post.shares = post.shares.filter((id) => id !== user_id);
+        await prisma.post.update({
+          where: { id: post_id },
+          data: { shares: post.shares },
+        });
+      } else {
+        post?.shares.push(user_id);
+        await prisma.post.update({
+          where: { id: post_id },
+          data: { shares: post!.shares },
+        });
+      }
+      res.status(201).json(post);
+    } catch (error) {
+      res.status(400).json(error);
+    }
+  },
+  commments: async (req: Request, res: Response) => {
+    try {
+      const { post_id, message, user_id } = req.body;
+
+      console.log(req.params, req.body);
+
+      const c = await prisma.comments.create({
+        data: { message: message, postId: post_id, userId: user_id },
+      });
+
+      const post = await prisma.post.findFirst({
+        where: { id: post_id },
+        include: { comments: true },
+      });
+      res.status(201).json(post);
+    } catch (error) {
+      res.status(400).json(error);
+    }
+  },
 };
 
 export { friendController };
