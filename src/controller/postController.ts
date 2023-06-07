@@ -30,7 +30,7 @@ const postController = {
   createPost: async (req: Request, res: Response) => {
     const { title, userId, profile_picture_path, username, image_path } =
       req.body;
-    console.log(req.body);
+    // console.log(req.body);
     try {
       const post = await prisma.post.create({
         data: {

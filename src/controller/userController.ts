@@ -7,7 +7,21 @@ const userController = {
   getUsers: async (req: Request, res: Response) => {
     try {
       const users = await prisma.user.findMany({
-        include: { Post: true },
+        select: {
+          id: true,
+          Post: {
+            select: {
+              comments: true,
+              image_path: true,
+              like: true,
+              id: true,
+              shares: true,
+            },
+          },
+          email: true,
+          friends: true,
+          profile_picture_path: true,
+        },
       });
       res.status(200).json(users);
     } catch (e) {
@@ -34,6 +48,14 @@ const userController = {
       const user = await prisma.user.findFirst({
         where: {
           email: email,
+        },
+        select: {
+          email: true,
+          id: true,
+          profile_picture_path: true,
+          name: true,
+          role: true,
+          password: true,
         },
       });
       // compare password before and after encrypt

@@ -24,12 +24,12 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 //===============================================
 // get all cars
-// router.get("/posts", postController.getPosts);
+router.get("/posts", postController.getPosts);
 // // get specific car
 // router.get("/post/:id", postController.getPost);
 // // create cars
 router.post("/add-post", upload.single("picPost"), postController.createPost);
-// router.post("/posts", postController.createPosts);
+router.post("/add-posts", postController.createPosts);
 // // delete car
 // router.delete("/post/:id", postController.deletePost);
 // // update car
