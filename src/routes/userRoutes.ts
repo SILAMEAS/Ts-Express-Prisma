@@ -29,7 +29,7 @@ router.get("/all", verifyToken, userController.getUsers);
 // get specific user
 router.get("/:id", verifyToken, userController.getUser);
 // create user
-router.post("/signup", upload.single("image"), userController.createUser);
+router.post("/register", upload.single("image"), userController.createUser);
 // delete user
 router.delete("/all", verifyToken, userController.deleteUsers);
 router.delete("/:id", verifyToken, userController.deleteUser);

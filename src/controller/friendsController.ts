@@ -95,7 +95,7 @@ const friendController = {
             }
           })
         ));
-      res.json({ friends: myfriends, "not-friends": notMyfriends });
+      res.json({ friends: myfriends, notFriends: notMyfriends });
     } catch (error) {
       res.json(error);
     }
