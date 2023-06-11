@@ -2,12 +2,55 @@ import { PrismaClient } from "@prisma/client";
 import express, { Request, Router, Response } from "express";
 
 const prisma = new PrismaClient();
+
 //--================================================
 const postController = {
   getPosts: async (req: Request, res: Response) => {
     try {
       const posts = await prisma.post.findMany({ include: { comments: true } });
       res.status(200).json(posts);
+    } catch (e) {
+      res.status(400).json(e);
+    }
+  },
+  getYourPostsAndFriendPost: async (req: Request, res: Response) => {
+    try {
+      const { useId } = req.params;
+      const DataUser = await prisma.user.findFirst({ where: { id: useId } });
+      const POST: any[] = [];
+      const yourPost = await prisma.user.findFirst({
+        where: { id: useId },
+        select: { Post: true },
+      });
+      yourPost &&
+        (await Promise.all(
+          yourPost?.Post.map((item) => {
+            if (item) {
+              POST.push(item);
+            }
+          })
+        )) &&
+        console.log(POST.length, " --", "yourPost", POST);
+
+      DataUser &&
+        (await Promise.all(
+          DataUser?.friends.map(async (friendId) => {
+            const friendPost = await prisma.user.findFirst({
+              where: { id: friendId },
+              select: { Post: true },
+            });
+
+            if (friendPost) {
+              friendPost.Post.map((item) => {
+                POST.push(item);
+              });
+            }
+          })
+        )) &&
+        console.log(POST.length, " --", "friendPost", POST);
+
+      console.log(POST.length, " --", "Result", POST);
+      res.status(200).json(POST);
     } catch (e) {
       res.status(400).json(e);
     }

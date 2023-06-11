@@ -6,6 +6,7 @@ import postsRoute from "./routes/postRoutes";
 import friendsRoute from "./routes/friendRoutes";
 import { verifyToken } from "./middleware/authMiddle";
 import dotenv from "dotenv";
+import path from "path";
 const cors = require("cors");
 dotenv.config();
 const app = express();
@@ -14,6 +15,8 @@ const prisma = new PrismaClient();
 app.use(express.json());
 // allow fron end can access to back end
 app.use(cors());
+app.use(express.static(path.join(__dirname, "../uploads")));
+app.use(express.static(path.join(__dirname, "../PostsPic")));
 // handle connection to database
 async function main() {
   // all routes that we have

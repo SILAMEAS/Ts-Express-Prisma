@@ -30,6 +30,7 @@ router.get("/posts", postController.getPosts);
 // // create cars
 router.post("/add-post", upload.single("picPost"), postController.createPost);
 router.post("/add-posts", postController.createPosts);
+router.get("/post-you-friend/:useId", postController.getYourPostsAndFriendPost);
 // // delete car
 // router.delete("/post/:id", postController.deletePost);
 // // update car
