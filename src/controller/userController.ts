@@ -71,18 +71,24 @@ const userController = {
   },
   createUser: async (req: Request, res: Response) => {
     const { email, password, name, profile_picture_path } = req.body;
-    const salt = await bcrypt.genSalt();
-    const hashPassword = await bcrypt.hash(password, salt);
+
     try {
-      const user = await prisma.user.create({
-        data: {
-          email: email,
-          password: hashPassword,
-          name: name,
-          profile_picture_path: profile_picture_path,
-        },
-      });
-      res.status(200).json(user);
+      if (email && password && name && profile_picture_path) {
+        const salt = await bcrypt.genSalt();
+        const hashPassword = await bcrypt.hash(password, salt);
+        const user = await prisma.user.create({
+          data: {
+            email: email,
+            password: hashPassword,
+            name: name,
+            profile_picture_path: profile_picture_path,
+          },
+        });
+        res.status(200).json(user);
+      } else {
+        console.log("all data is required");
+        res.status(400).json({ message: "data required" });
+      }
     } catch (error) {
       res.status(400).json(error);
     }

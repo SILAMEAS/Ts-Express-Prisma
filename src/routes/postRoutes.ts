@@ -31,6 +31,8 @@ router.get("/posts", postController.getPosts);
 router.post("/add-post", upload.single("picPost"), postController.createPost);
 router.post("/add-posts", postController.createPosts);
 router.get("/post-you-friend/:useId", postController.getYourPostsAndFriendPost);
+router.delete("/delete-post/:id", postController.deletePost);
+router.delete("/delete-all-posts/:useId", postController.deletePostS);
 // // delete car
 // router.delete("/post/:id", postController.deletePost);
 // // update car

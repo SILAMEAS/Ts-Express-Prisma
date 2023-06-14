@@ -19,13 +19,14 @@ const storage = multer.diskStorage({
       Math.round(Math.random() * 1e9) +
       ".jpg";
     req.body.profile_picture_path = fileName;
+    console.log(fileName);
     cb(null, fileName);
   },
 });
 //--================================================
 const upload = multer({ storage: storage });
 // get all users
-router.get("/all", verifyToken, userController.getUsers);
+router.get("/all", userController.getUsers);
 // get specific user
 router.get("/:id", verifyToken, userController.getUser);
 // create user

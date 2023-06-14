@@ -75,11 +75,12 @@ const postController = {
       req.body;
     // console.log(req.body);
     try {
+      const user = await prisma.user.findFirst({ where: { id: userId } });
       const post = await prisma.post.create({
         data: {
           userId: userId,
           title: title,
-          username: username,
+          username: user!.name ?? "UNKNOW",
           image_path: image_path,
           profile_picture_path: profile_picture_path,
         },
@@ -109,6 +110,32 @@ const postController = {
         },
       });
       res.status(200).json(post);
+    } catch (error) {
+      res.status(400).json(error);
+    }
+  },
+  deletePostS: async (req: Request, res: Response) => {
+    try {
+      let message = "";
+      const { userId } = req.params;
+      const user = await prisma.user.findFirst({
+        where: { id: userId },
+        include: { Post: true },
+      });
+      console.log(user);
+      if (user!.Post.length > 0) {
+        user!.Post.map(async (item) => {
+          const DeletePost = await prisma.post.delete({
+            where: {
+              id: item.id,
+            },
+          });
+        });
+      }
+      return res.status(200).json({
+        message:
+          user!.Post.length > 0 ? "Delete success" : "Account don't have post",
+      });
     } catch (error) {
       res.status(400).json(error);
     }
