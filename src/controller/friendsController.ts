@@ -103,22 +103,28 @@ const friendController = {
   likeUnlike: async (req: Request, res: Response) => {
     try {
       const { post_id, user_id } = req.body;
-      const post = await prisma.post.findFirst({ where: { id: post_id } });
-      if (post?.like.includes(user_id)) {
-        post.like = post.like.filter((id) => id !== user_id);
-        await prisma.post.update({
-          where: { id: post_id },
-          data: { like: post.like },
-        });
-      } else {
-        post?.like.push(user_id);
-        await prisma.post.update({
-          where: { id: post_id },
-          data: { like: post!.like },
-        });
+      console.log("idPost", post_id, "???", "userID", user_id);
+      if (post_id && user_id) {
+        const post = await prisma.post.findFirst({ where: { id: post_id } });
+        if (post?.like.includes(user_id)) {
+          post.like = post.like.filter((id) => id !== user_id);
+          const d = await prisma.post.update({
+            where: { id: post_id },
+            data: { like: post.like },
+          });
+        } else {
+          post?.like.push(user_id);
+          const c = await prisma.post.update({
+            where: { id: post_id },
+            data: { like: post!.like },
+          });
+        }
+        return res.status(201).json(post);
       }
-      res.status(201).json(post);
+
+      return res.status(400).json("required field");
     } catch (error) {
+      console.log(error);
       res.status(400).json(error);
     }
   },

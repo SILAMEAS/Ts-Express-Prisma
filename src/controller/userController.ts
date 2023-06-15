@@ -9,8 +9,10 @@ const userController = {
       const users = await prisma.user.findMany({
         select: {
           id: true,
+          name: true,
           Post: {
             select: {
+              title: true,
               comments: true,
               image_path: true,
               like: true,

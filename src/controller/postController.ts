@@ -7,7 +7,10 @@ const prisma = new PrismaClient();
 const postController = {
   getPosts: async (req: Request, res: Response) => {
     try {
-      const posts = await prisma.post.findMany({ include: { comments: true } });
+      const posts = await prisma.post.findMany({
+        include: { comments: true },
+        orderBy: { createdAt: "asc" },
+      });
       res.status(200).json(posts);
     } catch (e) {
       res.status(400).json(e);
@@ -46,11 +49,11 @@ const postController = {
               });
             }
           })
-        )) &&
-        console.log(POST.length, " --", "friendPost", POST);
-
-      console.log(POST.length, " --", "Result", POST);
-      res.status(200).json(POST);
+        ));
+      const sortedAsc = POST.sort(
+        (objA, objB) => Number(objA.date) - Number(objB.date)
+      );
+      res.status(200).json(sortedAsc);
     } catch (e) {
       res.status(400).json(e);
     }
@@ -71,8 +74,7 @@ const postController = {
     }
   },
   createPost: async (req: Request, res: Response) => {
-    const { title, userId, profile_picture_path, username, image_path } =
-      req.body;
+    const { title, userId, profile_picture_path, image_path } = req.body;
     // console.log(req.body);
     try {
       const user = await prisma.user.findFirst({ where: { id: userId } });
@@ -85,8 +87,10 @@ const postController = {
           profile_picture_path: profile_picture_path,
         },
       });
+
       res.status(201).json(post);
     } catch (error) {
+      console.log(error);
       res.status(400).json(error);
     }
   },
@@ -98,19 +102,34 @@ const postController = {
       });
       res.status(200).json(posts);
     } catch (error) {
+      console.log(error);
       res.status(400).json(error);
     }
   },
   deletePost: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const post = await prisma.post.delete({
-        where: {
-          id: id,
-        },
-      });
-      res.status(200).json(post);
+      const { userId } = req.body;
+      console.log(id, userId);
+      const dataPost = await prisma.post.findFirst({ where: { id: id } });
+      console.log("postUserID", dataPost?.userId);
+      console.log("userId", userId);
+      console.log(dataPost?.userId === userId);
+      if (id && userId) {
+        if (dataPost?.userId === userId) {
+          const post = await prisma.post.delete({
+            where: {
+              id: id,
+            },
+          });
+          return res.status(200).json(post);
+        }
+        return res.status(400).json({ message: "Not your post" });
+      } else {
+        return res.status(400).json("data required");
+      }
     } catch (error) {
+      console.log(error);
       res.status(400).json(error);
     }
   },
