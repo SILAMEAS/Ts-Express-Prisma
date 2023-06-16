@@ -39,5 +39,6 @@ router.put("/:id", verifyToken, userController.updateUser);
 // login
 router.put("/:id", verifyToken, userController.updateUser);
 router.post("/login", userController.login);
+router.post("/mail", userController.mail);
 // export all routers of users
 export default router;

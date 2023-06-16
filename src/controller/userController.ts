@@ -1,8 +1,18 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import getToken from "../utils/generateToken/generateToken";
+const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const prisma = new PrismaClient();
+const transporter = nodemailer.createTransport({
+  port: 465, // true for 465, false for other ports
+  host: "smtp.gmail.com",
+  auth: {
+    user: "Las239879@gmai.com",
+    pass: "sila9846160",
+  },
+  secure: true,
+});
 const userController = {
   getUsers: async (req: Request, res: Response) => {
     try {
@@ -134,6 +144,28 @@ const userController = {
     try {
       const user = await prisma.user.deleteMany({});
       res.status(200).json(user);
+    } catch (error) {
+      res.status(400).json(error);
+    }
+  },
+  mail: async (req: Request, res: Response) => {
+    try {
+      const { to, subject, text } = req.body;
+      console.log(req.body);
+      const mailData = {
+        from: "sila@gmail.com",
+        to: to,
+        subject: subject,
+        text: text,
+        html: "<b> Hey there! </b><br> This is our first message sent with Nodemailer<br/>",
+      };
+      console.log(mailData);
+      transporter.sentMail(mailData, (error: any, info: any) => {
+        if (error) {
+          return console.log(error);
+        }
+        res.status(200).send({ message: "Mail send " });
+      });
     } catch (error) {
       res.status(400).json(error);
     }
