@@ -55,12 +55,12 @@ async function main() {
   // });
   // socket real time
   // socket connection
-  let allUsers: string[] = ["admin"];
+
   io.on("connection", (socket: any) => {
     // socket all id of user
     console.log("socket.id", socket.id);
     // fuction in socket
-    SocketConfig({ socket, allUsers });
+    SocketConfig({ socket });
   });
 }
 main()

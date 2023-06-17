@@ -35,6 +35,9 @@ model User {
   role                 Role     @default(USER)
   // RefreshToken         RefreshToken[]
   profile_picture_path String   @default("")
+  isOnline             Boolean  @default(false)
+  groupChannel         String   @default("Unknow")
+  userChannel          String   @default("Unknow")
   friends              String[]
 }
 
