@@ -33,9 +33,7 @@ const postController = {
             }
           })
         )) &&
-        console.log(POST.length, " --", "yourPost", POST);
-
-      DataUser &&
+        DataUser &&
         (await Promise.all(
           DataUser?.friends.map(async (friendId) => {
             const friendPost = await prisma.user.findFirst({
@@ -75,7 +73,7 @@ const postController = {
   },
   createPost: async (req: Request, res: Response) => {
     const { title, userId, profile_picture_path, image_path } = req.body;
-    // console.log(req.body);
+
     try {
       const user = await prisma.user.findFirst({ where: { id: userId } });
       const post = await prisma.post.create({
@@ -90,7 +88,6 @@ const postController = {
 
       res.status(201).json(post);
     } catch (error) {
-      console.log(error);
       res.status(400).json(error);
     }
   },
@@ -102,7 +99,6 @@ const postController = {
       });
       res.status(200).json(posts);
     } catch (error) {
-      console.log(error);
       res.status(400).json(error);
     }
   },
@@ -110,11 +106,9 @@ const postController = {
     try {
       const { id } = req.params;
       const { userId } = req.body;
-      console.log(id, userId);
+
       const dataPost = await prisma.post.findFirst({ where: { id: id } });
-      console.log("postUserID", dataPost?.userId);
-      console.log("userId", userId);
-      console.log(dataPost?.userId === userId);
+
       if (id && userId) {
         if (dataPost?.userId === userId) {
           const post = await prisma.post.delete({
@@ -129,7 +123,6 @@ const postController = {
         return res.status(400).json("data required");
       }
     } catch (error) {
-      console.log(error);
       res.status(400).json(error);
     }
   },
@@ -141,7 +134,7 @@ const postController = {
         where: { id: userId },
         include: { Post: true },
       });
-      console.log(user);
+
       if (user!.Post.length > 0) {
         user!.Post.map(async (item) => {
           const DeletePost = await prisma.post.delete({

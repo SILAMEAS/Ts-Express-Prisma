@@ -2,11 +2,14 @@ import express, { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import userRoute from "./routes/userRoutes";
 import carsRoute from "./routes/carRoutes";
+
 import postsRoute from "./routes/postRoutes";
 import friendsRoute from "./routes/friendRoutes";
 import { verifyToken } from "./middleware/authMiddle";
 import dotenv from "dotenv";
 import path from "path";
+import { SocketConfig } from "./SocketConfig";
+
 // open cors between backend and forn end
 const cors = require("cors");
 // config dotenv for using .env
@@ -24,9 +27,10 @@ const server = http.createServer(app);
 // allow fron end can access to back end
 app.use(cors());
 // open cors origin when we use socket.io
-const io = new Server(server, {
-  cors: { origin: "http://localhost:3000" },
+export const io = new Server(server, {
+  cors: { origin: "http://localhost:3000", method: ["GET", "POST"] },
 });
+const socketRoute = require("./routes/Socket/socketRoute")(io);
 // can get data as json form fron end
 app.use(express.json());
 
@@ -37,19 +41,38 @@ app.use(express.static(path.join(__dirname, "../PostsPic")));
 async function main() {
   // all routes that we have
   app.use("/api/v1/user", userRoute);
+  app.use("/api/v1/socket", socketRoute);
   app.use("/api/v1", verifyToken, carsRoute);
   app.use("/api/v1/post", verifyToken, postsRoute);
   app.use("/api/v1/friend", verifyToken, friendsRoute);
+  // io.on("connection", (socket: any) => {
+  //   console.log("==> " + socket.id);
+  //   socket.on("connected", (userId: any) => {
+  //     users[userId] = socket.id;
+  //     console.log("users", users);
+  //   });
+
+  // });
   // socket real time
+  // socket connection
+  let allUsers: string[] = ["admin"];
+  io.on("connection", (socket: any) => {
+    // socket all id of user
+    console.log("socket.id", socket.id);
+    // fuction in socket
+    SocketConfig({ socket, allUsers });
+  });
 }
 main()
   .then(async () => {
     await prisma.$disconnect();
     // if database connect success
-    console.log("DB connnected");
-    app.listen(process.env.PORT, () => {
+    console.log("DB connnected and running socket");
+    server.listen(process.env.PORT, () => {
       // show the port that we running back end
-      console.log("Server running on port: " + process.env.PORT);
+      console.log(
+        "Server running on port: http://localhost:" + process.env.PORT
+      );
     });
   })
   .catch(async (e) => {
@@ -57,18 +80,3 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
-io.on("connection", (socket: any) => {
-  console.log("user connected : " + socket.id);
-  socket.on("join-room", (data: any) => {
-    console.log("join room", data);
-    socket.join(data);
-  });
-  socket.on("sm", (data: any) => {
-    console.log("send", data);
-    // socket.broadcast.emit("rm", data);
-    socket.to(data.room).emit("rm", data);
-  });
-});
-server.listen(process.env.PORT_Socket, () => {
-  console.log("socket run on port http://localhost:" + process.env.PORT_Socket);
-});
