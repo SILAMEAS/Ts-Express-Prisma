@@ -28,7 +28,7 @@ const server = http.createServer(app);
 app.use(cors());
 // open cors origin when we use socket.io
 export const io = new Server(server, {
-  cors: { origin: "http://localhost:3000", method: ["GET", "POST"] },
+  cors: { origin: "*", method: ["GET", "POST"] },
 });
 const socketRoute = require("./routes/Socket/socketRoute")(io);
 // can get data as json form fron end
@@ -55,12 +55,24 @@ async function main() {
   // });
   // socket real time
   // socket connection
-
+  var users: any = [];
   io.on("connection", (socket: any) => {
     // socket all id of user
-    console.log("socket.id", socket.id);
+    console.log("user connection", socket.id);
+    socket.on("user_connected", (username: any) => {
+      // save in array
+      console.log("process");
+      users[username] = socket.id;
+      //notify al connected user
+      io.emit("user_connected", username);
+    });
     // fuction in socket
     SocketConfig({ socket });
+    socket.on("send_message", (data: any) => {
+      // send event to reciever
+      var socketId = users[data.reciever];
+      io.to(socketId).emit("new_message", data);
+    });
   });
 }
 main()

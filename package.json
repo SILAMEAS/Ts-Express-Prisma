@@ -4,7 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "kill": "npx kill-port 5000",
     "dev": "nodemon src/index.ts",
+    "DEV": "kill dev",
     "migrate": "npx prisma migrate dev --name init"
   },
   "dependencies": {
