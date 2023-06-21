@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import userRoute from "./routes/userRoutes";
 import carsRoute from "./routes/carRoutes";
-
+import chatRoute from "./routes/Chat/chatRoutes";
 import postsRoute from "./routes/postRoutes";
 import friendsRoute from "./routes/friendRoutes";
 import { verifyToken } from "./middleware/authMiddle";
@@ -40,31 +40,27 @@ app.use(express.static(path.join(__dirname, "../PostsPic")));
 // all processing
 async function main() {
   // all routes that we have
+  //================================================================
   app.use("/api/v1/user", userRoute);
   app.use("/api/v1/socket", socketRoute);
   app.use("/api/v1", verifyToken, carsRoute);
   app.use("/api/v1/post", verifyToken, postsRoute);
   app.use("/api/v1/friend", verifyToken, friendsRoute);
-  // io.on("connection", (socket: any) => {
-  //   console.log("==> " + socket.id);
-  //   socket.on("connected", (userId: any) => {
-  //     users[userId] = socket.id;
-  //     console.log("users", users);
-  //   });
-
-  // });
-  // socket real time
-  // socket connection
+  app.use("/api/v1/chat", verifyToken, chatRoute);
+  //================================================================
   var users: any = [];
   io.on("connection", (socket: any) => {
     // socket all id of user
-    console.log("user connection", socket.id);
+    // console.log("user connection", socket.id);
     socket.on("user_connected", (username: any) => {
       // save in array
-      console.log("process");
+      // console.log("process");
+      // console.log(username);
+      // console.log(users);
       users[username] = socket.id;
+      // console.log(users);
       //notify al connected user
-      io.emit("user_connected", username);
+      io.emit("user_connected", users);
     });
     // fuction in socket
     SocketConfig({ socket });

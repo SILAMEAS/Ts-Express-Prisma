@@ -30,6 +30,13 @@ const userController = {
               shares: true,
             },
           },
+          chat: {
+            select: {
+              senderId: true,
+              recieverId: true,
+              text: true,
+            },
+          },
           email: true,
           friends: true,
           profile_picture_path: true,
