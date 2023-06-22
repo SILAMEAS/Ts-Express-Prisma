@@ -40,16 +40,21 @@ const friendController = {
   getFriendOrNotFriend: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const user = await prisma.user.findFirst({ where: { id: id } });
+      const user = await prisma.user.findFirst({
+        where: { id: id },
+        include: { chat: true },
+      });
       const myfriends: {
         id: string;
         username: string;
         profile_picture_path: string;
+        online: boolean;
       }[] = [];
       const notMyfriends: {
         id: string;
         username: string;
         profile_picture_path: string;
+        online: boolean;
       }[] = [];
 
       user &&
@@ -63,10 +68,12 @@ const friendController = {
                 id: string;
                 username: string;
                 profile_picture_path: string;
+                online: boolean;
               } = {
                 id: yourFriend!.id,
                 username: yourFriend!.name,
                 profile_picture_path: yourFriend!.profile_picture_path,
+                online: yourFriend?.online,
               };
               myfriends.push(format);
             }
@@ -85,10 +92,12 @@ const friendController = {
                   id: string;
                   username: string;
                   profile_picture_path: string;
+                  online: boolean;
                 } = {
                   id: notFriends.id,
                   profile_picture_path: notFriends.profile_picture_path,
                   username: notFriends.name,
+                  online: notFriends.online,
                 };
                 notMyfriends.push(format);
               }

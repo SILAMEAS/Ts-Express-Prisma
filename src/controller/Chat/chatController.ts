@@ -5,7 +5,12 @@ const chatController = {
   addChat: async (req: Request, res: Response) => {
     try {
       const { text, senderId, recieverId } = req.body;
-      // console.log(req.body);
+
+      if (!senderId || !recieverId || !text) {
+        return res.status(404).json({
+          message: "required fields",
+        });
+      }
       const sender = await prisma.user.findFirst({ where: { id: senderId } });
       const reciever = await prisma.user.findFirst({
         where: { id: recieverId },
@@ -18,26 +23,25 @@ const chatController = {
           message: "User not found",
         });
       }
-      const addChatMessageToSender = await prisma.chat.create({
-        data: {
-          userId: senderId,
-          recieverId: recieverId,
-          senderId: senderId,
-          text: text,
-        },
-      });
-      const addChatMessageToReciever = await prisma.chat.create({
-        data: {
-          userId: recieverId,
-          recieverId: recieverId,
-          senderId: senderId,
-          text: text,
-        },
+      const addChatMessage = await prisma.chat.createMany({
+        data: [
+          {
+            userId: recieverId,
+            recieverId: recieverId,
+            senderId: senderId,
+            text: text,
+          },
+          {
+            userId: senderId,
+            recieverId: recieverId,
+            senderId: senderId,
+            text: text,
+          },
+        ],
       });
 
       res.status(201).json({
-        SENDER: addChatMessageToSender,
-        RECIEVER: addChatMessageToReciever,
+        data: addChatMessage,
       });
     } catch (e) {
       res.status(400).json(e);
@@ -46,22 +50,14 @@ const chatController = {
   deleteChat: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const { senderId } = req.params;
-      const sender = await prisma.user.findFirst({
-        where: { id: senderId },
+      const { userId } = req.params;
+      const deleteMessage = await prisma.user.findFirst({
+        where: { id: userId },
         select: { chat: true },
       });
-      // const deleteCHAT = await prisma.chat.delete({
-      //   where: {
-      //     id: id,
-      //   },
-      // });
       res.status(200).json({
-        message: sender,
+        message: deleteMessage,
       });
-      // res.status(200).json({
-      //   message: "message ( " + deleteCHAT.text + " ) deleted successfully",
-      // });
     } catch (e) {
       res.status(400).json(e);
     }
@@ -70,11 +66,8 @@ const chatController = {
     try {
       const deleteCHAT = await prisma.chat.deleteMany({});
       res.status(200).json({
-        message: "delete successfully",
+        message: deleteCHAT,
       });
-      // res.status(200).json({
-      //   message: "message ( " + deleteCHAT.text + " ) deleted successfully",
-      // });
     } catch (e) {
       res.status(400).json(e);
     }
@@ -125,17 +118,17 @@ const chatController = {
   },
   veiwChatBySenderId: async (req: Request, res: Response) => {
     try {
-      const { sendId } = req.params;
-      const { recieverId } = req.body;
-      console.log(sendId + "/" + recieverId);
-      const sender = await prisma.user.findFirst({ where: { id: sendId } });
-      const reciever = await prisma.user.findFirst({
-        where: { id: recieverId },
+      const { userId } = req.params;
+
+      const message = await prisma.user.findFirst({
+        where: { id: userId },
+        select: {
+          chat: true,
+        },
       });
-      console.log("D");
-      // const chat = await prisma.chat.findMany({});
+
       res.status(200).json({
-        message: sender?.email + "-- to--" + reciever?.email,
+        message: message,
       });
     } catch (e) {
       res.status(400).json(e);

@@ -51,7 +51,7 @@ const userController = {
     try {
       const { id } = req.params;
       const user = await prisma.user.findFirst({
-        include: { Post: true },
+        include: { Post: true, chat: true },
         where: {
           id: id,
         },
@@ -59,6 +59,29 @@ const userController = {
       res.status(200).json(user);
     } catch (e) {
       res.status(400).json(e);
+    }
+  },
+  logout: async (req: Request, res: Response) => {
+    const { email } = req.params;
+    if (!email) {
+      res.status(400).json({ message: "Required email" });
+    }
+    try {
+      const offine = await prisma.user.update({
+        where: {
+          email: email,
+        },
+        data: {
+          online: false,
+        },
+        select: {
+          email: true,
+          online: true,
+        },
+      });
+      res.status(200).json(offine);
+    } catch (error) {
+      res.status(401).json(error);
     }
   },
   login: async (req: Request, res: Response) => {
@@ -77,12 +100,25 @@ const userController = {
           password: true,
         },
       });
+      const onilne = await prisma.user.update({
+        where: {
+          email: email,
+        },
+        data: {
+          online: true,
+        },
+      });
       // compare password before and after encrypt
       const compare = await bcrypt.compare(password, user?.password);
       if (!compare) res.status(401).json({ message: "password not correct" });
       if (compare) {
         const token = getToken(user);
-        res.status(200).json({ user, token, message: "login success" });
+        res.status(200).json({
+          user,
+          token,
+          message: "login success",
+          online: onilne.online,
+        });
       }
     } catch (e) {
       res.status(400).json(e);
