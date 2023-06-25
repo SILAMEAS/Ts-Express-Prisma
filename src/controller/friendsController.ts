@@ -42,7 +42,6 @@ const friendController = {
       const { id } = req.params;
       const user = await prisma.user.findFirst({
         where: { id: id },
-        include: { chat: true },
       });
       const myfriends: {
         id: string;

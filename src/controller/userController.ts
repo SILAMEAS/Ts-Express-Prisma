@@ -30,13 +30,6 @@ const userController = {
               shares: true,
             },
           },
-          chat: {
-            select: {
-              senderId: true,
-              recieverId: true,
-              text: true,
-            },
-          },
           email: true,
           friends: true,
           profile_picture_path: true,
@@ -51,7 +44,7 @@ const userController = {
     try {
       const { id } = req.params;
       const user = await prisma.user.findFirst({
-        include: { Post: true, chat: true },
+        include: { Post: true },
         where: {
           id: id,
         },
