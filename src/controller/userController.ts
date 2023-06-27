@@ -44,9 +44,17 @@ const userController = {
     try {
       const { id } = req.params;
       const user = await prisma.user.findFirst({
-        include: { Post: true },
+        // include: { Post: true },
         where: {
           id: id,
+        },
+        select: {
+          email: true,
+          friends: true,
+          online: true,
+          profile_picture_path: true,
+          name: true,
+          id: true,
         },
       });
       res.status(200).json(user);

@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import { chatCC } from "../../controller/Chat/chatController";
+import { chat } from "../../controller/Chat/chatController";
 
 const router = express.Router();
 // get all cars
@@ -10,11 +10,11 @@ const router = express.Router();
 // router.delete("/deleteChat/:id", chatController.deleteChat);
 // router.delete("/deleteChats", chatController.deleteChats);
 //===========================================================
-router.post("/", chatCC.createChat);
-router.get("/:userId", chatCC.userChats);
-router.get("/all", chatCC.Allchat);
-router.get("/find/:firstId/:secondId", chatCC.findChat);
-router.delete("/delete", chatCC.delete);
+router.post("/", chat.createChat);
+router.get("/:userId", chat.userChats);
+router.get("/", chat.Allchat);
+router.get("/find/:firstId/:secondId", chat.findChat);
+router.delete("/delete", chat.delete);
 
 // // delete car
 // router.delete("/friend/:id", postController.deletePost);

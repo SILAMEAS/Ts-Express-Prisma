@@ -14,7 +14,7 @@ const messageController = {
     }
     try {
       const createChat = await prisma.message.create({
-        data: { chatId: chatId, sender: senderId, text: text },
+        data: { chatId: chatId, senderId: senderId, text: text },
       });
       res.status(201).json(createChat);
     } catch (e) {
@@ -28,6 +28,14 @@ const messageController = {
         where: { chatId: chatId },
       });
       res.status(201).json(createChat);
+    } catch (e) {
+      res.status(400).json(e);
+    }
+  },
+  deleteMessages: async (req: Request, res: Response) => {
+    try {
+      const deleteMessage = await prisma.message.deleteMany({});
+      res.status(200).json(deleteMessage);
     } catch (e) {
       res.status(400).json(e);
     }

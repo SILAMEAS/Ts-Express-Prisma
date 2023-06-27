@@ -135,7 +135,7 @@ const prisma = new PrismaClient();
 //     }
 //   },
 // };
-const chatCC = {
+const chat = {
   createChat: async (req: Request, res: Response) => {
     const { senderId, recieverId } = req.body;
     console.log(req.body);
@@ -144,11 +144,28 @@ const chatCC = {
         message: "required fields",
       });
     }
+    const reciever = await prisma.user.findFirst({
+      where: { id: recieverId },
+      select: { profile_picture_path: true, name: true },
+    });
+    const sender = await prisma.user.findFirst({
+      where: { id: senderId },
+      select: { profile_picture_path: true, name: true },
+    });
     try {
-      const createChat = await prisma.chat.create({
-        data: { members: [senderId, recieverId] },
-      });
-      res.status(201).json(createChat);
+      if (reciever && sender) {
+        const createChat = await prisma.chat.create({
+          data: {
+            members: [senderId, recieverId],
+            chatName: [reciever.name, sender.name],
+            chatPicture: [
+              reciever.profile_picture_path,
+              sender.profile_picture_path,
+            ],
+          },
+        });
+        res.status(201).json(createChat);
+      }
     } catch (e) {
       res.status(400).json(e);
     }
@@ -158,24 +175,68 @@ const chatCC = {
       const chat = await prisma.chat.findMany({
         where: {
           members: { hasSome: [req.params.userId] },
-          // createdAt: "2023-06-22T15:05:49.334Z",
         },
       });
+      // const members: any[] = [];
+      // chat.map((member) => member.members.map((item) => members.push(item)));
+      // console.log(members);
+      // const users = await prisma.user.findMany({
+      //   where: {
+      //     id: { in: members },
+      //   },
+      //   select: {
+      //     online: true,
+      //     id: true,
+      //     name: true,
+      //     profile_picture_path: true,
+      //   },
+      // });
+      res.status(200).json({ chat });
+      // const members: string[] = [];
+      // const Allusers: any[] = [];
 
-      res.status(200).json(chat);
+      // chat.map((chat) => chat.members.map((member) => members.push(member)));
+      // members.length > 0 &&
+      //   (await Promise.all(
+      //     members
+      //       .filter((item) => item !== req.params.userId)
+      //       .map(async (member) => {
+      //         const user = await prisma.user.findFirst({
+      //           where: { id: member },
+      //           select: {
+      //             name: true,
+      //             online: true,
+      //             profile_picture_path: true,
+      //             id: true,
+      //           },
+      //         });
+      //         // console.log(user);
+      //         if (user) {
+      //           Allusers.push(user);
+      //         }
+      //         console.log(Allusers);
+      //       })
+      //   ));
+
+      // if (members.length > 0) {
+      //   // console.log(members);
+      // members.map(async (member) => {
+      //   const user = await prisma.user.findFirst({ where: { id: member } });
+      //   // console.log(user);
+      //   if (user) {
+      //     Allusers.push(user);
+      //   }
+      //   console.log(Allusers);
+      // });
+      // }
     } catch (e) {
       res.status(400).json(e);
     }
   },
   Allchat: async (req: Request, res: Response) => {
+    console.log("object");
     try {
-      const chat = await prisma.chat.findMany({
-        where: {
-          // members: { in: [req.params.userId] } as any,
-          // createdAt: "2023-06-22T15:05:49.334Z",
-        },
-      });
-
+      const chat = await prisma.chat.findMany({});
       res.status(200).json(chat);
     } catch (e) {
       res.status(400).json(e);
@@ -211,4 +272,4 @@ const chatCC = {
   },
 };
 
-export { chatCC };
+export { chat };

@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import userRoute from "./routes/userRoutes";
 import carsRoute from "./routes/carRoutes";
 import chatRoute from "./routes/Chat/chatRoutes";
+import messageRoute from "./routes/Chat/messageRoutes";
 import postsRoute from "./routes/postRoutes";
 import friendsRoute from "./routes/friendRoutes";
 import { verifyToken } from "./middleware/authMiddle";
@@ -47,6 +48,7 @@ async function main() {
   app.use("/api/v1/post", verifyToken, postsRoute);
   app.use("/api/v1/friend", verifyToken, friendsRoute);
   app.use("/api/v1/chat", verifyToken, chatRoute);
+  app.use("/api/v1/message", verifyToken, messageRoute);
   //================================================================
   var users: any = [];
   io.on("connection", (socket: any) => {

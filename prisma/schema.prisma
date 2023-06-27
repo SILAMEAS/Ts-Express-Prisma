@@ -90,10 +90,12 @@ model comments {
 }
 
 model chat {
-  id        String   @id @unique() @default(uuid())
-  members   String[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @unique() @default(uuid())
+  chatName    String[] @default([])
+  chatPicture String[] @default([])
+  members     String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model message {
