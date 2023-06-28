@@ -24,7 +24,7 @@ const messageController = {
   getMessages: async (req: Request, res: Response) => {
     const { chatId } = req.params;
     try {
-      const createChat = await prisma.message.findFirst({
+      const createChat = await prisma.message.findMany({
         where: { chatId: chatId },
       });
       res.status(201).json(createChat);
@@ -36,6 +36,24 @@ const messageController = {
     try {
       const deleteMessage = await prisma.message.deleteMany({});
       res.status(200).json(deleteMessage);
+    } catch (e) {
+      res.status(400).json(e);
+    }
+  },
+  deleteMessagesById: async (req: Request, res: Response) => {
+    const { id } = req.params;
+    try {
+      const deleteMessage = await prisma.message.delete({ where: { id: id } });
+      res.status(200).json(deleteMessage);
+    } catch (e) {
+      res.status(400).json(e);
+    }
+  },
+  getAllMessages: async (req: Request, res: Response) => {
+    try {
+      const message = await prisma.message.findMany({});
+      res.status(200).json(message);
+      console.log("object");
     } catch (e) {
       res.status(400).json(e);
     }

@@ -138,34 +138,36 @@ const prisma = new PrismaClient();
 const chat = {
   createChat: async (req: Request, res: Response) => {
     const { senderId, recieverId } = req.body;
-    console.log(req.body);
-    if (!recieverId || !senderId) {
-      return res.status(404).json({
-        message: "required fields",
-      });
-    }
-    const reciever = await prisma.user.findFirst({
-      where: { id: recieverId },
-      select: { profile_picture_path: true, name: true },
-    });
-    const sender = await prisma.user.findFirst({
-      where: { id: senderId },
-      select: { profile_picture_path: true, name: true },
-    });
     try {
-      if (reciever && sender) {
-        const createChat = await prisma.chat.create({
-          data: {
-            members: [senderId, recieverId],
-            chatName: [reciever.name, sender.name],
-            chatPicture: [
-              reciever.profile_picture_path,
-              sender.profile_picture_path,
-            ],
-          },
+      if (!recieverId || !senderId) {
+        return res.status(404).json({
+          message: "required fields",
         });
-        res.status(201).json(createChat);
       }
+      const reciever = await prisma.user.findFirst({
+        where: { id: recieverId },
+        select: { profile_picture_path: true, name: true },
+      });
+      const sender = await prisma.user.findFirst({
+        where: { id: senderId },
+        select: { profile_picture_path: true, name: true },
+      });
+      if (!sender || !reciever) {
+        return res.status(404).json({
+          message: "sender or reciever is null",
+        });
+      }
+      const createChat = await prisma.chat.create({
+        data: {
+          members: [senderId, recieverId],
+          chatName: [reciever.name, sender.name],
+          chatPicture: [
+            reciever.profile_picture_path,
+            sender.profile_picture_path,
+          ],
+        },
+      });
+      res.status(201).json(createChat);
     } catch (e) {
       res.status(400).json(e);
     }
@@ -234,7 +236,7 @@ const chat = {
     }
   },
   Allchat: async (req: Request, res: Response) => {
-    console.log("object");
+    console.log("get all chat");
     try {
       const chat = await prisma.chat.findMany({});
       res.status(200).json(chat);
@@ -263,8 +265,22 @@ const chat = {
   delete: async (req: Request, res: Response) => {
     try {
       const Del = await prisma.chat.deleteMany({});
+      const message = await prisma.message.deleteMany({});
       res.status(200).json({
-        message: Del,
+        chat: Del,
+        message: message,
+      });
+    } catch (e) {
+      res.status(400).json(e);
+    }
+  },
+  deleteById: async (req: Request, res: Response) => {
+    const { id } = req.params;
+    try {
+      const Del = await prisma.chat.delete({ where: { id: id } });
+
+      res.status(200).json({
+        Del,
       });
     } catch (e) {
       res.status(400).json(e);

@@ -14,7 +14,8 @@ router.post("/", chat.createChat);
 router.get("/:userId", chat.userChats);
 router.get("/", chat.Allchat);
 router.get("/find/:firstId/:secondId", chat.findChat);
-router.delete("/delete", chat.delete);
+router.delete("/delete/all", chat.delete);
+router.delete("/:id", chat.deleteById);
 
 // // delete car
 // router.delete("/friend/:id", postController.deletePost);

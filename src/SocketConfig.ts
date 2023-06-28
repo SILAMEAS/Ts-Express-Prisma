@@ -4,6 +4,7 @@ export const SocketConfig = ({ socket }: { socket: any }) => {
   socket.on("start-active", (data: any) => {
     console.log("active -->", data);
     socket.broadcast.emit("active", data);
+    socket.broadcast.emit("yaya", data);
   });
   // join room
   socket.on("join-room", (data: any) => {
