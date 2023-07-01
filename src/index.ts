@@ -81,11 +81,9 @@ main()
     await prisma.$disconnect();
     // if database connect success
     console.log("DB connnected and running socket");
-    server.listen(process.env.PORT, () => {
+    server.listen(5000, () => {
       // show the port that we running back end
-      console.log(
-        "Server running on port: http://localhost:" + process.env.PORT
-      );
+      console.log("Server running on port: http://localhost:" + 5000);
     });
   })
   .catch(async (e) => {

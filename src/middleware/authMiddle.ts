@@ -8,7 +8,7 @@ export function verifyToken(req: Request, res: Response, next: any) {
   if (!token) {
     return res.status(401).json({ message: "Unauthrization" });
   }
-  jwt.verify(token, process.env.JWT_ACCESS_SECRET, (err: any, user: any) => {
+  jwt.verify(token, "SECRET123", (err: any, user: any) => {
     if (err) {
       return res.status(401).json({ message: "Unauthrization" });
     }
