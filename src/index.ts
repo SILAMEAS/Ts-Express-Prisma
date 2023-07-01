@@ -42,6 +42,9 @@ app.use(express.static(path.join(__dirname, "../PostsPic")));
 async function main() {
   // all routes that we have
   //================================================================
+  app.get("/", (req: Request, res: Response) => {
+    res.json({ message: "working" });
+  });
   app.use("/api/v1/user", userRoute);
   app.use("/api/v1/socket", socketRoute);
   app.use("/api/v1", verifyToken, carsRoute);
