@@ -157,6 +157,21 @@ const chat = {
           message: "sender or reciever is null",
         });
       }
+      const find = await prisma.chat.findFirst({
+        where: {
+          OR: [
+            {
+              members: { hasSome: [senderId, recieverId] },
+            },
+            { members: { hasSome: [recieverId, senderId] } },
+          ],
+        },
+      });
+      if (find) {
+        return res.status(400).json({
+          message: "Chat already exists",
+        });
+      }
       const createChat = await prisma.chat.create({
         data: {
           members: [senderId, recieverId],

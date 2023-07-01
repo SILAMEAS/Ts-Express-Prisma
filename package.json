@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "start":"node src/index.ts",
     "kill": "npx kill-port 5000",
     "dev": "nodemon src/index.ts",
     "DEV": "kill dev",
